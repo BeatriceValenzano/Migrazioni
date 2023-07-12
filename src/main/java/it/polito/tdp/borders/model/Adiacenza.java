@@ -23,5 +23,4 @@ public class Adiacenza {
 		this.state2no = state2no;
 	}
 	
-	
 }

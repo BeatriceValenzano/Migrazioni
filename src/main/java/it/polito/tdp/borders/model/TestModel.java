@@ -3,13 +3,9 @@ package it.polito.tdp.borders.model;
 public class TestModel {
 	public static void main(String args[]) {
 		
-		Model m = new Model() ;
 		
-		m.creaGrafo(1950);
-		
-
-
-		
+		int resto = 500%8;
+		System.out.println(resto);
 	}
 
 }

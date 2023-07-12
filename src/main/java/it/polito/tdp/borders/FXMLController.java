@@ -6,6 +6,7 @@ package it.polito.tdp.borders;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.borders.model.Country;
@@ -38,31 +39,43 @@ public class FXMLController {
 
 	@FXML
 	void doCalcolaConfini(ActionEvent event) {
+		
 		txtResult.clear();
-		String annoS = txtAnno.getText();
+		int anno;
 		try {
-			int anno = Integer.parseInt(annoS);
-
-			model.creaGrafo(anno);
-
-			boxNazione.getItems().addAll(this.model.getCountries());
-
-			// calcola numero di confini
-			List<CountryAndNumber> result = model.getCountryAndNumbers();
-
-			for (CountryAndNumber c : result) {
-				txtResult.appendText(c.toString() + "\n");
-			}
-
+			anno = Integer.parseInt(txtAnno.getText());
+			if(anno<1816 || anno>2006)
+				throw new NumberFormatException();
 		} catch (NumberFormatException e) {
-			txtResult.appendText("Errore di formattazione dell'anno\n");
+			txtResult.setText("Inserisci un anno compreso tra 1816 e 2006!");
 			return;
 		}
+		model.creaGrafo(anno);
+		this.boxNazione.getItems().addAll(model.getVertici());
+		List<CountryAndNumber> result = model.getCountryAndNumbers();
+		for (CountryAndNumber cn : result) {
+			txtResult.appendText(cn.toString() + "\n");
+		}
+		
 	}
 
 	@FXML
 	void doSimula(ActionEvent event) {
-
+		
+		txtResult.clear();
+		Country partenza = this.boxNazione.getValue();
+		if(partenza == null) {
+			txtResult.appendText("Errore: devi selezionare una nazione\n");
+			return;
+		}
+		this.txtResult.appendText("Migrazioni partendo da " + partenza.getStateName() + ":\n");
+		Map<Country, Integer> stanziali = model.simulaMigrazione(partenza);
+		for(Country c : stanziali.keySet()) {
+			int num = stanziali.get(c);
+			if(num>0)
+				txtResult.appendText(" > " + c.getStateAbb() + " : " + num + "\n");
+		}
+		txtResult.appendText("Passi di simulazione: " + model.getnPassiSim() + "\n");
 	}
 
 	@FXML // This method is called by the FXMLLoader when initialization is complete
@@ -74,5 +87,7 @@ public class FXMLController {
 
 	public void setModel(Model model) {
 		this.model = model;
+		
+		
 	}
 }
